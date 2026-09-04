@@ -1,0 +1,381 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>לוח מעקב אימונים</title>
+<style>
+  :root{
+    --bg: #12130f;
+    --panel: #1b1c16;
+    --panel-2: #22241c;
+    --line: #33352a;
+    --text: #ece9df;
+    --text-dim: #9a9a8c;
+    --accent: #c9e26b;
+    --accent-dim: #7a8a44;
+    --danger: #d9704f;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0;
+    background:var(--bg);
+    color:var(--text);
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Arial, sans-serif;
+    -webkit-font-smoothing:antialiased;
+  }
+  .wrap{max-width:480px;margin:0 auto;padding:18px 14px 60px;}
+
+  header{margin-bottom:16px;}
+  header h1{
+    font-size:22px;
+    margin:0 0 4px;
+    letter-spacing:-0.02em;
+    font-weight:700;
+  }
+  header p{margin:0;color:var(--text-dim);font-size:13px;}
+
+  .tabs{
+    display:grid;
+    grid-template-columns: repeat(4,1fr);
+    gap:6px;
+    margin:16px 0 18px;
+  }
+  .tab{
+    background:var(--panel);
+    border:1px solid var(--line);
+    color:var(--text-dim);
+    padding:10px 4px;
+    border-radius:8px;
+    text-align:center;
+    font-size:13px;
+    font-weight:600;
+    cursor:pointer;
+  }
+  .tab.active{
+    background:var(--accent);
+    color:#151610;
+    border-color:var(--accent);
+  }
+
+  .day-label{
+    font-size:12px;
+    color:var(--text-dim);
+    margin-bottom:10px;
+  }
+
+  .exercise{
+    background:var(--panel);
+    border:1px solid var(--line);
+    border-radius:10px;
+    padding:12px 12px 10px;
+    margin-bottom:10px;
+  }
+  .ex-head{
+    display:flex;
+    justify-content:space-between;
+    align-items:flex-start;
+    gap:8px;
+  }
+  .ex-name{
+    font-size:15px;
+    font-weight:600;
+    line-height:1.3;
+  }
+  .ex-target{
+    font-size:12px;
+    color:var(--text-dim);
+    margin-top:2px;
+  }
+  .yt-link{
+    flex-shrink:0;
+    display:flex;
+    align-items:center;
+    gap:5px;
+    background:var(--panel-2);
+    border:1px solid var(--line);
+    color:var(--text);
+    text-decoration:none;
+    font-size:11px;
+    padding:6px 9px;
+    border-radius:20px;
+    white-space:nowrap;
+  }
+  .yt-link svg{width:13px;height:13px;fill:var(--danger);}
+
+  .log-row{
+    display:flex;
+    gap:6px;
+    margin-top:10px;
+    align-items:center;
+  }
+  .log-row input{
+    background:var(--panel-2);
+    border:1px solid var(--line);
+    color:var(--text);
+    border-radius:7px;
+    padding:8px;
+    font-size:14px;
+    width:100%;
+    text-align:center;
+  }
+  .log-row input::placeholder{color:var(--text-dim);}
+  .log-row button{
+    background:var(--accent);
+    color:#151610;
+    border:none;
+    border-radius:7px;
+    padding:8px 12px;
+    font-size:13px;
+    font-weight:700;
+    cursor:pointer;
+    flex-shrink:0;
+  }
+  .log-row button:disabled{opacity:0.5;}
+
+  .history{
+    margin-top:8px;
+    display:flex;
+    flex-wrap:wrap;
+    gap:5px;
+  }
+  .history-chip{
+    font-size:11px;
+    color:var(--text-dim);
+    background:var(--bg);
+    border:1px solid var(--line);
+    border-radius:6px;
+    padding:3px 7px;
+  }
+  .history-chip.best{
+    color:var(--accent);
+    border-color:var(--accent-dim);
+  }
+  .history-empty{
+    font-size:11px;
+    color:var(--text-dim);
+    font-style:italic;
+  }
+
+  .top-note{
+    font-size:11px;
+    color:var(--text-dim);
+    background:var(--panel);
+    border:1px solid var(--line);
+    border-radius:8px;
+    padding:8px 10px;
+    margin-bottom:14px;
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <h1>לוח מעקב אימונים</h1>
+    <p>עליון/תחתון · 4 ימים בשבוע · היפרטרופיה</p>
+  </header>
+
+  <div class="top-note" id="topNote">רשום משקל וחזרות בכל סט. הנתונים נשמרים אוטומטית בין ביקורים - בתנאי שפותחים את הקובץ הזה עם "פתח ב-Safari" (לא Quick Look), ותמיד מאותו קובץ.</div>
+
+  <div class="tabs" id="tabs"></div>
+  <div class="day-label" id="dayLabel"></div>
+  <div id="exerciseList"></div>
+</div>
+
+<script>
+const YT_ICON = '<svg viewBox="0 0 24 24"><path d="M23.5 6.2s-.2-1.6-.9-2.3c-.9-.9-1.9-.9-2.3-1C17.3 2.6 12 2.6 12 2.6h0s-5.3 0-8.3.3c-.4 0-1.4.1-2.3 1-.7.7-.9 2.3-.9 2.3S.2 8.1.2 10v1.8c0 1.9.2 3.8.2 3.8s.2 1.6.9 2.3c.9.9 2 .9 2.6 1 1.9.2 8.1.3 8.1.3s5.3 0 8.3-.3c.4 0 1.4-.1 2.3-1 .7-.7.9-2.3.9-2.3s.2-1.9.2-3.8V10c0-1.9-.2-3.8-.2-3.8zM9.7 14.6V7.4l6.4 3.6-6.4 3.6z"/></svg>';
+
+const days = [
+  { key:"A1", label:"אימון A - עליון (1)", exercises:[
+    { id:"a1_chest_press", name:"לחיצת חזה במכונה", target:"3x10-12", search:"Chest Press Machine tutorial form" },
+    { id:"a1_pec_deck", name:"פרפר במכונה (Pec Deck)", target:"3x10-12", search:"Pec Deck Machine tutorial form" },
+    { id:"a1_lat_pulldown", name:"פולי עליון (מתח בישיבה)", target:"3x10-12", search:"Lat Pulldown tutorial form" },
+    { id:"a1_seated_row", name:"חתירה במכונה בישיבה", target:"3x10-12", search:"Seated Cable Row tutorial form" },
+    { id:"a1_shoulder_press", name:"לחיצת כתפיים במכונה", target:"3x10-12", search:"Shoulder Press Machine tutorial form" },
+    { id:"a1_bicep_curl", name:"כפיפת מרפקים במוט", target:"3x10-12", search:"Barbell Bicep Curl tutorial form" },
+    { id:"a1_bicep_cable", name:"כפיפת מרפקים בפולי תחתון", target:"3x12-15", search:"Cable Bicep Curl tutorial form" },
+    { id:"a1_triceps_rope", name:"פשיטת מרפקים בפולי (חבל)", target:"3x10-12", search:"Triceps Rope Pushdown tutorial form" },
+    { id:"a1_triceps_overhead_db", name:"פשיטת מרפקים מעל הראש עם משקולת", target:"3x12-15", search:"Overhead Dumbbell Triceps Extension tutorial form" }
+  ]},
+  { key:"B1", label:"אימון B - תחתון (1)", exercises:[
+    { id:"b1_leg_press", name:"לחיצת רגליים", target:"3x10-12", search:"Leg Press Machine tutorial form" },
+    { id:"b1_leg_extension", name:"מכונת פשיטת ברך", target:"3x12-15", search:"Leg Extension Machine tutorial form" },
+    { id:"b1_leg_curl", name:"מכונת כפיפת ברך", target:"3x12-15", search:"Lying Leg Curl Machine tutorial form" },
+    { id:"b1_calf_raise", name:"תאומים במכונה", target:"3x15-20", search:"Calf Raise Machine tutorial form" },
+    { id:"b1_hip_adduction", name:"מכונת הרחקה/קירוב ירכיים", target:"3x12-15", search:"Hip Abductor Adductor Machine tutorial form" }
+  ]},
+  { key:"A2", label:"אימון A - עליון (2)", exercises:[
+    { id:"a2_incline_press", name:"לחיצת חזה בשיפוע במכונה", target:"3x10-12", search:"Incline Chest Press Machine tutorial form" },
+    { id:"a2_cable_fly", name:"פרפר בכבלים", target:"3x12-15", search:"Cable Fly tutorial form" },
+    { id:"a2_low_pulley_row", name:"פולי תחתון בישיבה", target:"3x10-12", search:"Low Pulley Seated Row tutorial form" },
+    { id:"a2_row_machine", name:"מכונת חתירה (אחיזה שונה)", target:"3x10-12", search:"Row Machine wide grip tutorial form" },
+    { id:"a2_lateral_raise", name:"הרחקת כתפיים לצד עם משקולות", target:"3x12-15", search:"Dumbbell Lateral Raise tutorial form" },
+    { id:"a2_hammer_curl", name:"כפיפת מרפקים בפטיש", target:"3x10-12", search:"Hammer Curl tutorial form" },
+    { id:"a2_concentration_curl", name:"כפיפת מרפקים בריכוז (Concentration Curl)", target:"3x12-15", search:"Concentration Curl tutorial form" },
+    { id:"a2_overhead_triceps", name:"פשיטת מרפקים בפולי (מוט)", target:"3x10-12", search:"Overhead Triceps Extension cable bar tutorial form" },
+    { id:"a2_skull_crusher", name:"פשיטת מרפקים בשכיבה עם מוט", target:"3x12-15", search:"Lying Triceps Extension Skull Crusher tutorial form" }
+  ]},
+  { key:"B2", label:"אימון B - תחתון (2)", exercises:[
+    { id:"b2_leg_press_alt", name:"לחיצת רגליים (עמדה שונה)", target:"3x10-12", search:"Leg Press wide stance tutorial form" },
+    { id:"b2_hip_thrust", name:"הרמת אגן (Hip Thrust)", target:"3x10-12", search:"Hip Thrust tutorial form" },
+    { id:"b2_leg_curl", name:"מכונת כפיפת ברך", target:"3x12-15", search:"Seated Leg Curl Machine tutorial form" },
+    { id:"b2_seated_calf", name:"תאומים בישיבה", target:"3x15-20", search:"Seated Calf Raise tutorial form" },
+    { id:"b2_glute_kickback", name:"מכונת גלוטס (Glute Kickback)", target:"3x12-15", search:"Glute Kickback Machine tutorial form" }
+  ]}
+];
+
+let activeDay = "A1";
+
+function ytUrl(q){
+  return "https://www.youtube.com/results?search_query=" + encodeURIComponent(q);
+}
+
+function renderTabs(){
+  const tabs = document.getElementById("tabs");
+  tabs.innerHTML = "";
+  days.forEach(d=>{
+    const btn = document.createElement("div");
+    btn.className = "tab" + (d.key===activeDay ? " active" : "");
+    btn.textContent = d.key;
+    btn.onclick = ()=>{ activeDay = d.key; render(); };
+    tabs.appendChild(btn);
+  });
+}
+
+// שמירה מקומית בדפדפן (localStorage) - עובד גם כשהקובץ נפתח עצמאית מחוץ ל-Claude,
+// כל עוד פותחים אותו דרך "פתח ב-Safari" ולא דרך Quick Look של אפליקציית Files.
+const STORAGE_PREFIX = "workout_tracker_v1_";
+
+function storageAvailable(){
+  try{
+    const testKey = "__test__";
+    localStorage.setItem(testKey, "1");
+    localStorage.removeItem(testKey);
+    return true;
+  }catch(e){
+    return false;
+  }
+}
+const HAS_STORAGE = storageAvailable();
+let memoryFallback = {};
+
+async function getLogs(exId){
+  const key = STORAGE_PREFIX + exId;
+  try{
+    if(HAS_STORAGE){
+      const raw = localStorage.getItem(key);
+      return raw ? JSON.parse(raw) : [];
+    }
+    return memoryFallback[key] || [];
+  }catch(e){
+    console.error("Storage read error:", e);
+    return [];
+  }
+}
+
+async function saveLog(exId, entry){
+  const key = STORAGE_PREFIX + exId;
+  const logs = await getLogs(exId);
+  logs.push(entry);
+  try{
+    if(HAS_STORAGE){
+      localStorage.setItem(key, JSON.stringify(logs));
+    }else{
+      memoryFallback[key] = logs;
+    }
+  }catch(e){
+    console.error("Storage write error:", e);
+  }
+}
+
+function formatDate(iso){
+  const d = new Date(iso);
+  return d.toLocaleDateString('he-IL', {day:'numeric', month:'numeric'});
+}
+
+async function renderExercise(ex, container){
+  const card = document.createElement("div");
+  card.className = "exercise";
+
+  card.innerHTML = `
+    <div class="ex-head">
+      <div>
+        <div class="ex-name">${ex.name}</div>
+        <div class="ex-target">יעד: ${ex.target}</div>
+      </div>
+      <a class="yt-link" href="${ytUrl(ex.search)}" target="_blank" rel="noopener">
+        ${YT_ICON} <span>סרטון</span>
+      </a>
+    </div>
+    <div class="log-row">
+      <input type="number" inputmode="decimal" placeholder="משקל (ק״ג)" class="w-input" />
+      <input type="number" inputmode="numeric" placeholder="חזרות" class="r-input" />
+      <button class="add-btn">שמור סט</button>
+    </div>
+    <div class="history" id="hist-${ex.id}"><span class="history-empty">טוען...</span></div>
+  `;
+
+  container.appendChild(card);
+
+  const wInput = card.querySelector(".w-input");
+  const rInput = card.querySelector(".r-input");
+  const addBtn = card.querySelector(".add-btn");
+  const histEl = card.querySelector(`#hist-${ex.id}`);
+
+  async function refreshHistory(){
+    const logs = await getLogs(ex.id);
+    if(logs.length === 0){
+      histEl.innerHTML = '<span class="history-empty">אין עדיין סטים רשומים</span>';
+      return;
+    }
+    const maxWeight = Math.max(...logs.map(l=>parseFloat(l.weight)||0));
+    const recent = logs.slice(-8);
+    histEl.innerHTML = recent.map(l=>{
+      const isBest = parseFloat(l.weight) === maxWeight && maxWeight > 0;
+      return `<span class="history-chip${isBest?' best':''}">${formatDate(l.date)}: ${l.weight}×${l.reps}</span>`;
+    }).join("");
+  }
+
+  addBtn.onclick = async ()=>{
+    const w = wInput.value;
+    const r = rInput.value;
+    if(!w || !r) return;
+    addBtn.disabled = true;
+    try{
+      await saveLog(ex.id, { date: new Date().toISOString(), weight: w, reps: r });
+      wInput.value = "";
+      rInput.value = "";
+      await refreshHistory();
+    }catch(e){
+      console.error("Storage error:", e);
+    }finally{
+      addBtn.disabled = false;
+    }
+  };
+
+  refreshHistory();
+}
+
+function checkStorageWarning(){
+  if(!HAS_STORAGE){
+    const note = document.getElementById("topNote");
+    note.textContent = "שים לב: הדפדפן הזה חוסם שמירה מקומית (למשל תצוגת Quick Look). פתח את הקובץ עם \"פתח ב-Safari\" כדי שהנתונים יישמרו.";
+    note.style.borderColor = "var(--danger)";
+    note.style.color = "var(--danger)";
+  }
+}
+
+function render(){
+  checkStorageWarning();
+  renderTabs();
+  const day = days.find(d=>d.key===activeDay);
+  document.getElementById("dayLabel").textContent = day.label;
+  const list = document.getElementById("exerciseList");
+  list.innerHTML = "";
+  day.exercises.forEach(ex=>renderExercise(ex, list));
+}
+
+render();
+</script>
+</body>
+</html>
