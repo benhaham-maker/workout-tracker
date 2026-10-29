@@ -2,380 +2,796 @@
 <html lang="he" dir="rtl">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>לוח מעקב אימונים</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>פול בודי 3 ימים</title>
 <style>
   :root{
-    --bg: #12130f;
-    --panel: #1b1c16;
-    --panel-2: #22241c;
-    --line: #33352a;
-    --text: #ece9df;
-    --text-dim: #9a9a8c;
-    --accent: #c9e26b;
-    --accent-dim: #7a8a44;
-    --danger: #d9704f;
+    --bg:#0c0d0a; --bg-elev:#16170f; --panel:#1a1c14; --panel-2:#21231a;
+    --line:#2c2e22; --text:#f2f0e6; --text-dim:#9a9a8c; --text-faint:#6f7062;
+    --accent:#d7f26b; --accent-soft:rgba(215,242,107,0.12); --accent-dim:#7c8a3e;
+    --danger:#e2664a; --danger-soft:rgba(226,102,74,0.14);
+    --radius:16px; --radius-sm:10px;
   }
-  *{box-sizing:border-box;}
+  *{box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
   body{
     margin:0;
-    background:var(--bg);
+    background:radial-gradient(1200px 500px at 50% -10%, rgba(215,242,107,0.06), transparent 60%), var(--bg);
     color:var(--text);
-    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Arial, sans-serif;
-    -webkit-font-smoothing:antialiased;
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Arial,sans-serif;
+    -webkit-font-smoothing:antialiased; min-height:100vh;
   }
-  .wrap{max-width:480px;margin:0 auto;padding:18px 14px 60px;}
-
-  header{margin-bottom:16px;}
-  header h1{
-    font-size:22px;
-    margin:0 0 4px;
-    letter-spacing:-0.02em;
-    font-weight:700;
-  }
+  .wrap{max-width:480px;margin:0 auto;padding:20px 14px 90px;}
+  header .eyebrow{font-size:11px;letter-spacing:.08em;color:var(--accent);font-weight:700;margin-bottom:4px;}
+  header h1{font-size:23px;margin:0 0 4px;letter-spacing:-.02em;font-weight:800;}
   header p{margin:0;color:var(--text-dim);font-size:13px;}
 
+  .protocol{
+    background:linear-gradient(145deg,var(--panel),var(--bg-elev));
+    border:1px solid var(--line);border-radius:var(--radius);
+    margin:16px 0;overflow:hidden;
+  }
+  .protocol summary{
+    list-style:none;cursor:pointer;padding:13px 16px;font-size:13px;font-weight:700;
+    display:flex;justify-content:space-between;align-items:center;
+  }
+  .protocol summary::-webkit-details-marker{display:none;}
+  .protocol summary .chev{color:var(--text-faint);transition:transform .2s;}
+  .protocol[open] summary .chev{transform:rotate(180deg);}
+  .protocol .body{padding:0 16px 14px;font-size:12.5px;line-height:1.75;color:var(--text-dim);}
+  .protocol .body b{color:var(--accent);font-weight:700;}
+  .protocol .body ul{margin:6px 0 0;padding:0 18px 0 0;}
+
   .tabs{
-    display:grid;
-    grid-template-columns: repeat(4,1fr);
-    gap:6px;
-    margin:16px 0 18px;
+    display:grid;grid-template-columns:repeat(3,1fr);gap:6px;
+    background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:4px;margin-bottom:16px;
   }
   .tab{
-    background:var(--panel);
-    border:1px solid var(--line);
-    color:var(--text-dim);
-    padding:10px 4px;
-    border-radius:8px;
-    text-align:center;
-    font-size:13px;
-    font-weight:600;
-    cursor:pointer;
+    color:var(--text-dim);padding:10px 4px;border-radius:10px;text-align:center;
+    font-size:13px;font-weight:700;cursor:pointer;transition:background .15s,color .15s;
   }
-  .tab.active{
-    background:var(--accent);
-    color:#151610;
-    border-color:var(--accent);
-  }
+  .tab.active{background:var(--accent);color:#12130a;}
 
-  .day-label{
-    font-size:12px;
-    color:var(--text-dim);
-    margin-bottom:10px;
-  }
+  .day-label{font-size:13px;font-weight:700;margin-bottom:12px;display:flex;align-items:center;gap:8px;}
+  .day-label::before{content:"";width:6px;height:6px;border-radius:50%;background:var(--accent);flex-shrink:0;}
 
   .exercise{
-    background:var(--panel);
-    border:1px solid var(--line);
-    border-radius:10px;
-    padding:12px 12px 10px;
-    margin-bottom:10px;
+    background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);
+    padding:14px 14px 12px;margin-bottom:12px;
+    box-shadow:0 1px 0 rgba(255,255,255,.02) inset,0 8px 20px -12px rgba(0,0,0,.6);
   }
-  .ex-head{
-    display:flex;
-    justify-content:space-between;
-    align-items:flex-start;
-    gap:8px;
-  }
-  .ex-name{
-    font-size:15px;
-    font-weight:600;
-    line-height:1.3;
-  }
-  .ex-target{
-    font-size:12px;
-    color:var(--text-dim);
-    margin-top:2px;
+  .ex-head{display:flex;justify-content:space-between;align-items:flex-start;gap:10px;}
+  .ex-num{font-size:11px;color:var(--text-faint);font-weight:700;margin-bottom:2px;}
+  .ex-name{font-size:15.5px;font-weight:700;line-height:1.35;}
+  .ex-target{font-size:11.5px;color:var(--text-dim);margin-top:4px;line-height:1.5;}
+  .ex-note{
+    font-size:12px;color:var(--accent);margin-top:8px;background:var(--accent-soft);
+    border:1px solid var(--accent-dim);border-radius:var(--radius-sm);padding:6px 10px;line-height:1.5;
   }
   .yt-link{
-    flex-shrink:0;
-    display:flex;
-    align-items:center;
-    gap:5px;
-    background:var(--panel-2);
-    border:1px solid var(--line);
-    color:var(--text);
-    text-decoration:none;
-    font-size:11px;
-    padding:6px 9px;
-    border-radius:20px;
-    white-space:nowrap;
+    flex-shrink:0;display:flex;align-items:center;gap:5px;background:var(--panel-2);
+    border:1px solid var(--line);color:var(--text);text-decoration:none;font-size:11px;
+    font-weight:600;padding:7px 11px;border-radius:20px;white-space:nowrap;
   }
-  .yt-link svg{width:13px;height:13px;fill:var(--danger);}
+  .yt-link svg{width:12px;height:12px;fill:var(--danger);}
 
-  .log-row{
-    display:flex;
-    gap:6px;
-    margin-top:10px;
-    align-items:center;
+  .last-time{
+    margin-top:10px;font-size:12px;color:var(--text-dim);
+    display:flex;align-items:center;gap:6px;flex-wrap:wrap;
   }
+  .last-time b{color:var(--text);font-variant-numeric:tabular-nums;}
+  .last-time .tip{color:var(--accent);font-weight:700;}
+
+  .log-row{display:flex;gap:7px;margin-top:10px;align-items:center;}
   .log-row input{
-    background:var(--panel-2);
-    border:1px solid var(--line);
-    color:var(--text);
-    border-radius:7px;
-    padding:8px;
-    font-size:14px;
-    width:100%;
-    text-align:center;
+    background:var(--panel-2);border:1px solid var(--line);color:var(--text);
+    border-radius:var(--radius-sm);padding:10px 8px;font-size:16px;width:100%;
+    text-align:center;font-variant-numeric:tabular-nums;
   }
-  .log-row input::placeholder{color:var(--text-dim);}
-  .log-row button{
-    background:var(--accent);
-    color:#151610;
-    border:none;
-    border-radius:7px;
-    padding:8px 12px;
-    font-size:13px;
-    font-weight:700;
-    cursor:pointer;
-    flex-shrink:0;
+  .log-row input:focus{outline:none;border-color:var(--accent-dim);}
+  .log-row input::placeholder{color:var(--text-faint);font-size:12.5px;}
+  .log-row select{
+    background:var(--panel-2);border:1px solid var(--line);color:var(--text);border-radius:var(--radius-sm);
+    padding:10px 4px;font-size:14px;width:100%;text-align:center;appearance:none;-webkit-appearance:none;
   }
-  .log-row button:disabled{opacity:0.5;}
+  .log-row .rir-wrap{width:84px;flex-shrink:0;}
+  .log-row2{display:flex;gap:7px;margin-top:7px;align-items:center;}
+  .wu-lbl{display:flex;align-items:center;gap:6px;font-size:12.5px;color:var(--text-dim);padding:8px 4px;min-height:44px;cursor:pointer;white-space:nowrap;}
+  .wu-lbl input{width:20px;height:20px;accent-color:var(--accent);}
+  .fill-btn{
+    background:var(--panel-2);border:1px solid var(--line);color:var(--text);border-radius:var(--radius-sm);
+    padding:0 10px;min-height:44px;font-size:12px;font-weight:700;cursor:pointer;white-space:nowrap;
+  }
+  .add-btn{
+    flex:1;background:var(--accent);color:#12130a;border:none;border-radius:var(--radius-sm);
+    min-height:44px;padding:0 14px;font-size:14px;font-weight:800;cursor:pointer;
+  }
+  .add-btn:active,.fill-btn:active{transform:scale(.97);}
+  .ex-stats{margin-top:8px;display:flex;flex-wrap:wrap;align-items:center;gap:4px 12px;font-size:11.5px;color:var(--text-dim);}
+  .ex-stats:empty{display:none;}
+  .ex-stats b{color:var(--text);font-variant-numeric:tabular-nums;}
+  .ex-stats .up{color:var(--accent);font-weight:700;}
+  .ex-stats .down{color:var(--danger);font-weight:700;}
+  .ex-stats svg{width:84px;height:24px;}
+  .ex-stats svg polyline{fill:none;stroke:var(--accent);stroke-width:2;stroke-linejoin:round;stroke-linecap:round;}
+  .ex-stats svg circle{fill:var(--accent);}
 
-  .history{
-    margin-top:8px;
-    display:flex;
-    flex-wrap:wrap;
-    gap:5px;
+  .history-toggle{
+    margin-top:10px;font-size:11.5px;color:var(--text-dim);display:flex;
+    align-items:center;justify-content:space-between;cursor:pointer;padding:4px 2px;
   }
-  .history-chip{
-    font-size:11px;
-    color:var(--text-dim);
-    background:var(--bg);
-    border:1px solid var(--line);
-    border-radius:6px;
-    padding:3px 7px;
+  .history-toggle .count{
+    background:var(--panel-2);border:1px solid var(--line);border-radius:20px;
+    padding:2px 9px;font-weight:700;color:var(--text);margin-right:6px;
   }
-  .history-chip.best{
-    color:var(--accent);
-    border-color:var(--accent-dim);
-  }
-  .history-empty{
-    font-size:11px;
-    color:var(--text-dim);
-    font-style:italic;
-  }
+  .history-toggle .chevron{transition:transform .2s;color:var(--text-faint);}
+  .history-toggle.open .chevron{transform:rotate(180deg);}
 
-  .top-note{
-    font-size:11px;
-    color:var(--text-dim);
-    background:var(--panel);
-    border:1px solid var(--line);
-    border-radius:8px;
-    padding:8px 10px;
-    margin-bottom:14px;
+  .history{margin-top:8px;display:none;flex-direction:column;gap:10px;}
+  .history.open{display:flex;}
+  .day-group-title{font-size:11px;color:var(--text-faint);font-weight:700;margin-bottom:5px;}
+  .day-group-sets{display:flex;flex-direction:column;gap:5px;}
+  .history-entry{
+    display:flex;align-items:center;justify-content:space-between;background:var(--bg-elev);
+    border:1px solid var(--line);border-radius:var(--radius-sm);padding:7px 10px;font-size:12.5px;
   }
+  .history-entry{flex-wrap:wrap;}
+  .history-entry.wu{opacity:.65;}
+  .history-entry.best{border-color:var(--accent-dim);background:var(--accent-soft);}
+  .hd-left{display:flex;align-items:center;gap:8px;}
+  .hd-set{color:var(--text-faint);font-size:11px;min-width:34px;}
+  .hd-value{font-weight:700;font-variant-numeric:tabular-nums;}
+  .hd-star{color:var(--accent);font-size:11.5px;font-weight:700;}
+  .hd-rir{font-size:10.5px;color:var(--text-dim);border:1px solid var(--line);border-radius:10px;padding:1px 6px;}
+  .hd-acts{display:flex;gap:2px;}
+  .hd-edit,.hd-del{
+    background:none;border:none;color:var(--text-dim);font-size:16px;cursor:pointer;
+    width:44px;height:44px;line-height:1;border-radius:10px;
+  }
+  .hd-del:active{background:var(--danger-soft);color:var(--danger);}
+  .hd-edit:active{background:var(--panel-2);}
+  .day-group-title .vol{color:var(--text-dim);font-weight:600;margin-right:6px;}
+  .edit-row{width:100%;display:flex;flex-wrap:wrap;gap:6px;align-items:center;padding:4px 0;}
+  .edit-row input[type=number],.edit-row select{
+    background:var(--panel-2);border:1px solid var(--line);color:var(--text);border-radius:var(--radius-sm);
+    padding:10px 6px;font-size:16px;width:76px;text-align:center;min-height:44px;
+  }
+  .edit-row select{font-size:14px;width:84px;}
+  .edit-row button{min-height:44px;padding:0 14px;border-radius:var(--radius-sm);font-weight:800;font-size:13px;cursor:pointer;border:1px solid var(--line);background:var(--panel-2);color:var(--text);}
+  .edit-row .e-save{background:var(--accent);color:#12130a;border:none;}
+  .history-empty{font-size:12px;color:var(--text-faint);font-style:italic;padding:4px 2px;}
+
+
+  .grp-title{
+    display:flex;align-items:center;justify-content:space-between;margin:20px 2px 10px;
+    padding-bottom:7px;border-bottom:1px solid var(--line);
+  }
+  .grp-title:first-child{margin-top:4px;}
+  .grp-title .g-name{font-size:14px;font-weight:800;display:flex;align-items:center;gap:7px;}
+  .grp-title .g-sets{font-size:11px;color:var(--text-dim);font-weight:600;}
+  .works{margin-top:9px;display:flex;flex-wrap:wrap;align-items:center;gap:5px;}
+  .works .w-lbl{font-size:10.5px;color:var(--text-faint);font-weight:700;margin-left:2px;}
+  .works .chip{font-size:11.5px;padding:3px 9px;border-radius:20px;font-weight:600;border:1px solid var(--line);}
+  .works .chip.p{background:var(--accent-soft);border-color:var(--accent-dim);color:var(--accent);}
+  .works .chip.s{background:var(--panel-2);color:var(--text-dim);}
+  .works .sep{width:6px;}
+
+  .weekly{margin-top:22px;background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);overflow:hidden;}
+  .weekly summary{list-style:none;cursor:pointer;padding:13px 16px;font-size:13px;font-weight:700;display:flex;justify-content:space-between;}
+  .weekly summary::-webkit-details-marker{display:none;}
+  .weekly .wbody{padding:0 16px 14px;}
+  .w-row{display:grid;grid-template-columns:96px 1fr 52px;gap:10px;align-items:center;margin:8px 0;font-size:12.5px;}
+  .w-bar{height:8px;background:var(--panel-2);border-radius:8px;overflow:hidden;}
+  .w-fill{height:100%;background:var(--accent);border-radius:8px;}
+  .w-fill.low{background:var(--accent-dim);}
+  .w-num{text-align:left;color:var(--text-dim);font-variant-numeric:tabular-nums;font-size:12px;}
+  .w-note{font-size:11.5px;color:var(--text-dim);line-height:1.6;margin-top:10px;}
+
+  .backup{
+    margin-top:22px;background:var(--panel);border:1px dashed var(--line);border-radius:var(--radius);
+    padding:12px 14px;font-size:12px;color:var(--text-dim);line-height:1.6;
+  }
+  .backup .btns{display:flex;gap:8px;margin-top:8px;}
+  .backup .warn{color:var(--accent);font-weight:700;margin-top:6px;}
+  .backup button,.backup label{
+    flex:1;text-align:center;background:var(--panel-2);border:1px solid var(--line);color:var(--text);
+    border-radius:var(--radius-sm);padding:12px 6px;font-size:12.5px;font-weight:700;cursor:pointer;
+  }
+  .backup input[type=file]{display:none;}
+
+  .toast{
+    position:fixed;bottom:calc(24px + env(safe-area-inset-bottom,0px));left:50%;transform:translateX(-50%) translateY(20px);
+    background:var(--text);color:#12130a;font-size:13px;font-weight:700;padding:10px 18px;
+    border-radius:30px;opacity:0;pointer-events:none;transition:opacity .2s,transform .2s;z-index:50;
+    display:flex;align-items:center;gap:14px;white-space:nowrap;
+  }
+  .toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
+  .toast.show.has-act{pointer-events:auto;padding:4px 6px 4px 18px;}
+  .toast-act{background:#12130a;color:var(--accent);border:none;border-radius:20px;min-height:40px;padding:0 18px;font-size:13px;font-weight:800;cursor:pointer;}
 </style>
 </head>
 <body>
 <div class="wrap">
   <header>
-    <h1>לוח מעקב אימונים</h1>
-    <p>עליון/תחתון · 4 ימים בשבוע · היפרטרופיה</p>
+    <div class="eyebrow">מעקב אימונים</div>
+    <h1>פול בודי · 3 ימים</h1>
+    <p>כל שריר 3 פעמים בשבוע · בנוי להיפרטרופיה</p>
   </header>
 
-  <div class="top-note" id="topNote">רשום משקל וחזרות בכל סט. הנתונים נשמרים אוטומטית בין ביקורים - בתנאי שפותחים את הקובץ הזה עם "פתח ב-Safari" (לא Quick Look), ותמיד מאותו קובץ.</div>
+  <details class="protocol" open>
+    <summary><span>איך מבצעים (מבוסס מחקר)</span><span class="chev">⌄</span></summary>
+    <div class="body">
+      <b>לוח שבועי:</b> א׳ · ג׳ · ה׳ (או כל 3 ימים עם יום מנוחה ביניהם).<br>
+      <b>קרבה לכשל:</b> כל סט עבודה מסתיים כשנשארו לך 1-2 חזרות בלבד (RIR 1-2). את הסט האחרון בתרגילי בידוד אפשר לקחת עד כשל.<br>
+      <b>מנוחה:</b> 2-3 דקות בתרגילים מורכבים, 1.5-2 דקות בתרגילי בידוד.<br>
+      <b>חימום:</b> 1-2 סטי חימום קלים רק בתרגיל המורכב הראשון, ובשאר תרגילים סט חימום אחד קל אם צריך.<br>
+      <b>רישום:</b> רושמים כל סט בנפרד מיד אחרי שסיימת אותו (משקל, חזרות, ואם רוצה גם RIR). המשקל והחזרות נשארים בשדות כדי שלא תקליד שוב. "כמו קודם" ממלא את הסט המקביל מהאימון הקודם. סט חימום מסמנים ב"חימום" והוא לא נספר בשיאים ובנפח. טעית? ✎ לעריכה, 🗑 למחיקה, ויש "בטל" ל-8 שניות.<br>
+      <b>התקדמות כפולה:</b>
+      <ul>
+        <li>בחר משקל שמאפשר את טווח החזרות שכתוב בכרטיס.</li>
+        <li>כשהצלחת את הגבול העליון של הטווח בכל הסטים - מעלים משקל באימון הבא.</li>
+        <li>"פעם קודמת" מעל השדות מראה את כל הסטים מהאימון הקודם, כדי לדעת מה לנצח.</li>
+        <li>"מדד כוח" הוא הערכה (נוסחת Epley) להשוואה בין אימונים. המגמה לאורך זמן חשובה, לא מספר בודד.</li>
+      </ul>
+      <b>טכניקה:</b> תנועה מלאה, ובתרגילים מסומנים - עצירה של שנייה בנקודת המתיחה.<br>
+      <b>דרופ סט (אופציונלי):</b> בסט האחרון של תרגיל בידוד, אחרי הכשל הורד 20-30% מהמשקל והמשך עוד סט קצר. מטא-אנליזה מ-2023 מצאה שזה לא מצמיח יותר מסטים רגילים, אבל חוסך זמן.<br>
+      <b>כדי לקצר:</b> סופרסט בין שרירים שלא מתחרים (חזה+גב, ביצפס+טריצפס) ומנוחה של כ-2 דקות אחרי הזוג.<br>
+      <b>אם נגמר הזמן:</b> מוותרים קודם על הסט הרביעי ברגליים ובתאומים, ואחר כך על התרגיל השני בידיים.<br>
+      <b>אחרי 4 שבועות:</b> אם ההתאוששות טובה, מוסיפים סט רביעי לתרגילי הבסיס.
+    </div>
+  </details>
 
   <div class="tabs" id="tabs"></div>
   <div class="day-label" id="dayLabel"></div>
   <div id="exerciseList"></div>
+
+  <details class="weekly">
+    <summary><span>סטים שבועיים לפי שריר</span><span style="color:var(--text-faint)">⌄</span></summary>
+    <div class="wbody" id="weeklyBody"></div>
+  </details>
+
+  <div class="backup">
+    <b style="color:var(--text)">גיבוי נתונים</b><br>
+    הנתונים נשמרים בדפדפן שבו פתחת את האתר, לא בענן. מחיקת נתוני Safari או הפסקה ארוכה בשימוש עלולות למחוק אותם. הוספה למסך הבית פותחת אחסון נפרד מ-Safari (מתחיל ריק), לכן קודם מייצאים גיבוי ואחר כך מייבאים אותו.
+    <div class="warn" id="backupWarn"></div>
+    <div class="btns">
+      <button id="exportBtn">ייצוא גיבוי</button>
+      <label for="importFile">ייבוא גיבוי</label>
+      <input type="file" id="importFile" accept="application/json,.json">
+    </div>
+    <div class="btns"><button id="csvBtn">ייצוא CSV (לאקסל)</button></div>
+  </div>
 </div>
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
 
 <script>
-const YT_ICON = '<svg viewBox="0 0 24 24"><path d="M23.5 6.2s-.2-1.6-.9-2.3c-.9-.9-1.9-.9-2.3-1C17.3 2.6 12 2.6 12 2.6h0s-5.3 0-8.3.3c-.4 0-1.4.1-2.3 1-.7.7-.9 2.3-.9 2.3S.2 8.1.2 10v1.8c0 1.9.2 3.8.2 3.8s.2 1.6.9 2.3c.9.9 2 .9 2.6 1 1.9.2 8.1.3 8.1.3s5.3 0 8.3-.3c.4 0 1.4-.1 2.3-1 .7-.7.9-2.3.9-2.3s.2-1.9.2-3.8V10c0-1.9-.2-3.8-.2-3.8zM9.7 14.6V7.4l6.4 3.6-6.4 3.6z"/></svg>';
+const YT_ICON='<svg viewBox="0 0 24 24"><path d="M23.5 6.2s-.2-1.6-.9-2.3c-.9-.9-1.9-.9-2.3-1C17.3 2.6 12 2.6 12 2.6h0s-5.3 0-8.3.3c-.4 0-1.4.1-2.3 1-.7.7-.9 2.3-.9 2.3S.2 8.1.2 10v1.8c0 1.9.2 3.8.2 3.8s.2 1.6.9 2.3c.9.9 2 .9 2.6 1 1.9.2 8.1.3 8.1.3s5.3 0 8.3-.3c.4 0 1.4-.1 2.3-1 .7-.7.9-2.3.9-2.3s.2-1.9.2-3.8V10c0-1.9-.2-3.8-.2-3.8zM9.7 14.6V7.4l6.4 3.6-6.4 3.6z"/></svg>';
 
-const days = [
-  { key:"A1", label:"אימון A - עליון (1)", exercises:[
-    { id:"a1_chest_press", name:"לחיצת חזה במכונה", target:"3x10-12", search:"Chest Press Machine tutorial form" },
-    { id:"a1_pec_deck", name:"פרפר במכונה (Pec Deck)", target:"3x10-12", search:"Pec Deck Machine tutorial form" },
-    { id:"a1_lat_pulldown", name:"פולי עליון (מתח בישיבה)", target:"3x10-12", search:"Lat Pulldown tutorial form" },
-    { id:"a1_seated_row", name:"חתירה במכונה בישיבה", target:"3x10-12", search:"Seated Cable Row tutorial form" },
-    { id:"a1_shoulder_press", name:"לחיצת כתפיים במכונה", target:"3x10-12", search:"Shoulder Press Machine tutorial form" },
-    { id:"a1_bicep_curl", name:"כפיפת מרפקים במוט", target:"3x10-12", search:"Barbell Bicep Curl tutorial form" },
-    { id:"a1_bicep_cable", name:"כפיפת מרפקים בפולי תחתון", target:"3x12-15", search:"Cable Bicep Curl tutorial form" },
-    { id:"a1_triceps_rope", name:"פשיטת מרפקים בפולי (חבל)", target:"3x10-12", search:"Triceps Rope Pushdown tutorial form" },
-    { id:"a1_triceps_overhead_db", name:"פשיטת מרפקים מעל הראש עם משקולת", target:"3x12-15", search:"Overhead Dumbbell Triceps Extension tutorial form" }
-  ]},
-  { key:"B1", label:"אימון B - תחתון (1)", exercises:[
-    { id:"b1_leg_press", name:"לחיצת רגליים", target:"3x10-12", search:"Leg Press Machine tutorial form" },
-    { id:"b1_leg_extension", name:"מכונת פשיטת ברך", target:"3x12-15", search:"Leg Extension Machine tutorial form" },
-    { id:"b1_leg_curl", name:"מכונת כפיפת ברך", target:"3x12-15", search:"Lying Leg Curl Machine tutorial form" },
-    { id:"b1_calf_raise", name:"תאומים במכונה", target:"3x15-20", search:"Calf Raise Machine tutorial form" },
-    { id:"b1_hip_adduction", name:"מכונת הרחקה/קירוב ירכיים", target:"3x12-15", search:"Hip Abductor Adductor Machine tutorial form" }
-  ]},
-  { key:"A2", label:"אימון A - עליון (2)", exercises:[
-    { id:"a2_incline_press", name:"לחיצת חזה בשיפוע במכונה", target:"3x10-12", search:"Incline Chest Press Machine tutorial form" },
-    { id:"a2_cable_fly", name:"פרפר בכבלים", target:"3x12-15", search:"Cable Fly tutorial form" },
-    { id:"a2_low_pulley_row", name:"פולי תחתון בישיבה", target:"3x10-12", search:"Low Pulley Seated Row tutorial form" },
-    { id:"a2_row_machine", name:"מכונת חתירה (אחיזה שונה)", target:"3x10-12", search:"Row Machine wide grip tutorial form" },
-    { id:"a2_lateral_raise", name:"הרחקת כתפיים לצד עם משקולות", target:"3x12-15", search:"Dumbbell Lateral Raise tutorial form" },
-    { id:"a2_hammer_curl", name:"כפיפת מרפקים בפטיש", target:"3x10-12", search:"Hammer Curl tutorial form" },
-    { id:"a2_concentration_curl", name:"כפיפת מרפקים בריכוז (Concentration Curl)", target:"3x12-15", search:"Concentration Curl tutorial form" },
-    { id:"a2_overhead_triceps", name:"פשיטת מרפקים בפולי (מוט)", target:"3x10-12", search:"Overhead Triceps Extension cable bar tutorial form" },
-    { id:"a2_skull_crusher", name:"פשיטת מרפקים בשכיבה עם מוט", target:"3x12-15", search:"Lying Triceps Extension Skull Crusher tutorial form" }
-  ]},
-  { key:"B2", label:"אימון B - תחתון (2)", exercises:[
-    { id:"b2_leg_press_alt", name:"לחיצת רגליים (עמדה שונה)", target:"3x10-12", search:"Leg Press wide stance tutorial form" },
-    { id:"b2_hip_thrust", name:"הרמת אגן (Hip Thrust)", target:"3x10-12", search:"Hip Thrust tutorial form" },
-    { id:"b2_leg_curl", name:"מכונת כפיפת ברך", target:"3x12-15", search:"Seated Leg Curl Machine tutorial form" },
-    { id:"b2_seated_calf", name:"תאומים בישיבה", target:"3x15-20", search:"Seated Calf Raise tutorial form" },
-    { id:"b2_glute_kickback", name:"מכונת גלוטס (Glute Kickback)", target:"3x12-15", search:"Glute Kickback Machine tutorial form" }
-  ]}
+const S=(n,reps,rest,rir)=>n+" סטים · "+reps+" חזרות · מנוחה "+rest+" · RIR "+rir;
+const HEAVY=n=>S(n,"8-12","2-3 דק׳","1-2");
+const ISO=n=>S(n,"10-15","1.5-2 דק׳","0-2");
+const CALF=n=>S(n,"10-15","1-1.5 דק׳","0-2");
+
+const GROUPS={
+  legs:{label:"רגליים",icon:"🦵"},
+  chest:{label:"חזה",icon:"🫁"},
+  back:{label:"גב",icon:"🔙"},
+  shoulders:{label:"כתפיים",icon:"🏔️"},
+  triceps:{label:"יד אחורית (טריצפס)",icon:"💪"},
+  biceps:{label:"יד קדמית (ביצפס)",icon:"💪"},
+  calves:{label:"תאומים",icon:"🦶"}
+};
+const MUSCLES={
+  quads:"ארבע ראשי",hams:"ירך אחורית",glutes:"ישבן",chest:"חזה",back:"גב",
+  delts:"כתף קדמית/צד",reardelts:"כתף אחורית",triceps:"טריצפס",biceps:"ביצפס",calves:"תאומים"
+};
+
+const days=[
+ {key:"A",label:"יום 1 · פול בודי A",exercises:[
+  {id:"a1_leg_press",grp:"legs",tally:["quads"],sets:3,name:"לחיצת רגליים",target:HEAVY(3),
+   works:{p:["ארבע ראשי"],s:["ישבן","ירך אחורית"]},
+   note:"ירידה עמוקה עד שהברכיים קרובות לחזה, בלי להרים את האגן מהמושב.",search:"Leg Press Machine tutorial form"},
+  {id:"a4_seated_leg_curl",grp:"legs",tally:["hams"],sets:4,name:"כפיפת ברך בישיבה",target:ISO(4),
+   works:{p:["ירך אחורית"],s:["תאומים"]},
+   note:"🎯 תרגיל מתיחה: ישיבה מותחת את הירך האחורית יותר משכיבה. ירידה איטית.",search:"Seated Leg Curl Machine tutorial form"},
+  {id:"a2_incline_press",grp:"chest",tally:["chest"],sets:3,name:"לחיצת חזה בשיפוע (מכונה או משקולות)",target:HEAVY(3),
+   works:{p:["חזה עליון"],s:["כתף קדמית","טריצפס"]},
+   note:"שיפוע קל בלבד, ירידה איטית של 2-3 שניות.",search:"Incline Chest Press Machine tutorial form"},
+  {id:"a2b_cable_fly",grp:"chest",tally:["chest"],sets:3,name:"פרפר בכבלים מלמטה למעלה",target:ISO(3),
+   works:{p:["חזה עליון"],s:["כתף קדמית"]},
+   note:"🎯 כבלים נותנים מתח גם בנקודת המתיחה. עצירה של שנייה כשהידיים פתוחות.",search:"Low to High Cable Fly tutorial form"},
+  {id:"a3_lat_pulldown",grp:"back",tally:["back"],sets:3,name:"פולי עליון אחיזה רחבה",target:HEAVY(3),
+   works:{p:["רחב הגב (לטס)"],s:["ביצפס","אמות","גב אמצעי"]},
+   note:"למשוך את המרפקים כלפי מטה ולצדדים, לא את הידיים.",search:"Lat Pulldown tutorial form"},
+  {id:"a3b_seated_cable_row",grp:"back",tally:["back"],sets:3,name:"חתירה בכבל בישיבה (משולש)",target:HEAVY(3),
+   works:{p:["גב אמצעי","רחב הגב"],s:["כתף אחורית","ביצפס"]},
+   note:"חזה פתוח, למשוך את הידית לבטן ולסחוט את השכמות. בלי להתנדנד עם הגוף.",search:"Seated Cable Row tutorial form"},
+  {id:"a5_cable_lateral_raise",grp:"shoulders",tally:["delts"],sets:3,name:"הרחקת כתף לצד בכבל",target:ISO(3),
+   works:{p:["כתף צדדית"],s:["טרפז עליון"]},
+   note:"כבל נותן מתח לאורך כל התנועה, בניגוד למשקולת.",search:"Cable Lateral Raise tutorial form"},
+  {id:"a6_overhead_triceps",grp:"triceps",tally:["triceps"],sets:3,name:"פשיטת מרפקים מעל הראש בכבל",target:ISO(3),
+   works:{p:["טריצפס (ראש ארוך)"],s:["ראש צדדי ופנימי"]},
+   note:"🎯 תרגיל מתיחה: מעל הראש מותח את הראש הארוך של הטריצפס, והמחקר מראה צמיחה גדולה יותר מפולי רגיל.",search:"Overhead Cable Triceps Extension tutorial form"},
+  {id:"a6b_skull_crusher",grp:"triceps",tally:["triceps"],sets:3,name:"לחיצה צרפתית (מוט EZ)",target:ISO(3),
+   works:{p:["טריצפס (ראש ארוך וצדדי)"],s:[]},
+   note:"להוריד את המוט עד שהוא נוגע ממש במצח, מרפקים קבועים ולא נפתחים לצדדים.",search:"Lying Triceps Extension Skull Crusher tutorial form"},
+  {id:"a7_incline_curl",grp:"biceps",tally:["biceps"],sets:3,name:"כפיפת מרפקים בשיפוע (משקולות)",target:ISO(3),
+   works:{p:["ביצפס (ראש ארוך)"],s:["אמות"]},
+   note:"🎯 תרגיל מתיחה: הזרועות תלויות מאחורי הגוף, עצור שנייה למטה.",search:"Incline Dumbbell Curl tutorial form"},
+  {id:"a7b_barbell_curl",grp:"biceps",tally:["biceps"],sets:3,name:"כפיפת מרפקים במוט",target:ISO(3),
+   works:{p:["ביצפס"],s:["ברכיאליס","אמות"]},
+   note:"מרפקים צמודים לגוף, בלי לנדנד את הגב.",search:"Barbell Bicep Curl tutorial form"},
+  {id:"a8_seated_calf",grp:"calves",tally:["calves"],sets:4,name:"תאומים בישיבה",target:CALF(4),
+   works:{p:["תאומים (סולאוס)"],s:[]},
+   note:"🎯 עצירה של שנייה בנקודה הנמוכה (מתיחה מלאה).",search:"Seated Calf Raise tutorial form"}
+ ]},
+ {key:"B",label:"יום 2 · פול בודי B",exercises:[
+  {id:"b1_smith_squat",grp:"legs",tally:["quads"],sets:3,name:"סקוואט במכונת סמית",target:HEAVY(3),
+   works:{p:["ארבע ראשי","ישבן"],s:["ירך אחורית","זקפי גב"]},
+   note:"רגליים מעט קדימה, ירידה עד ירכיים מקבילות לפחות.",search:"Smith Machine Squat tutorial form"},
+  {id:"b4_lying_leg_curl",grp:"legs",tally:["hams"],sets:4,name:"כפיפת ברך בשכיבה",target:ISO(4),
+   works:{p:["ירך אחורית"],s:["תאומים"]},
+   note:"ירידה איטית, בלי להרים את האגן.",search:"Lying Leg Curl Machine tutorial form"},
+  {id:"b2_flat_press",grp:"chest",tally:["chest"],sets:3,name:"לחיצת חזה שטוחה (מכונה או משקולות)",target:HEAVY(3),
+   works:{p:["חזה (אמצעי)"],s:["כתף קדמית","טריצפס"]},
+   note:"שכמות צמודות לספסל, מרפקים בזווית של כ-45 מעלות מהגוף.",search:"Chest Press Machine tutorial form"},
+  {id:"b2b_assisted_dips",grp:"chest",tally:["chest"],sets:3,name:"מקבילים במכונה בעזרה (Assisted Dips)",target:HEAVY(3),
+   works:{p:["חזה תחתון"],s:["טריצפס","כתף קדמית"]},
+   note:"גוף נוטה מעט קדימה כדי שהחזה יעבוד. לרדת עד נקודה נוחה לכתפיים.",search:"Assisted Dip Machine chest tutorial form"},
+  {id:"b3_chest_row",grp:"back",tally:["back"],sets:3,name:"חתירה במכונה עם תמיכה לחזה",target:HEAVY(3),
+   works:{p:["גב אמצעי ועליון","רחב הגב"],s:["כתף אחורית","ביצפס"]},
+   note:"התמיכה בחזה מוציאה את הגב התחתון מהתנועה ומרכזת את העבודה בגב העליון.",search:"Chest Supported Row Machine tutorial form"},
+  {id:"b3b_cable_pullover",grp:"back",tally:["back"],sets:3,name:"פול אובר בכבל (ידיים ישרות)",target:ISO(3),
+   works:{p:["רחב הגב"],s:["טריצפס (ראש ארוך)","חזה תחתון"]},
+   note:"🎯 מתיחה ארוכה לגב. זרועות כמעט ישרות, למשוך עם הגב ולא עם הידיים.",search:"Straight Arm Cable Pulldown pullover tutorial form"},
+  {id:"b5_shoulder_press",grp:"shoulders",tally:["delts"],sets:3,name:"לחיצת כתפיים במכונה",target:HEAVY(3),
+   works:{p:["כתף קדמית","כתף צדדית"],s:["טריצפס"]},
+   note:"לא לנעול מרפקים למעלה.",search:"Shoulder Press Machine tutorial form"},
+  {id:"b5b_reverse_pec_deck",grp:"shoulders",tally:["reardelts"],sets:3,name:"פרפר הפוך (כתף אחורית)",target:ISO(3),
+   works:{p:["כתף אחורית"],s:["גב עליון","טרפז אמצעי"]},
+   note:"משקל קל, מרפקים מעט כפופים, למשוך לצדדים ולא אחורה. זה שריר קטן ורגיש.",search:"Reverse Pec Deck Rear Delt Fly tutorial form"},
+  {id:"b6_triceps_pushdown",grp:"triceps",tally:["triceps"],sets:3,name:"פשיטת מרפקים בחבל (פולי עליון)",target:ISO(3),
+   works:{p:["טריצפס (ראש צדדי ופנימי)"],s:[]},
+   note:"מרפקים צמודים לגוף לאורך כל הסט.",search:"Triceps Rope Pushdown tutorial form"},
+  {id:"b7_preacher_curl",grp:"biceps",tally:["biceps"],sets:3,name:"כפיפת מרפקים בספסל סקוט",target:ISO(3),
+   works:{p:["ביצפס (ראש קצר)"],s:["ברכיאליס"]},
+   note:"🎯 תרגיל מתיחה: הכי קשה בנקודה הנמוכה. אל תקפוץ מלמטה.",search:"Preacher Curl Machine tutorial form"},
+  {id:"b8_standing_calf",grp:"calves",tally:["calves"],sets:4,name:"תאומים בעמידה",target:CALF(4),
+   works:{p:["תאומים (גסטרוקנמיוס)"],s:["סולאוס"]},
+   note:"🎯 עצירה של שנייה בנקודה הנמוכה.",search:"Standing Calf Raise Machine tutorial form"}
+ ]},
+ {key:"C",label:"יום 3 · פול בודי C",exercises:[
+  {id:"c1_leg_press_wide",grp:"legs",tally:["glutes"],sets:3,name:"לחיצת רגליים (רגליים גבוהות ורחבות)",target:HEAVY(3),
+   works:{p:["ישבן","ירך פנימית"],s:["ארבע ראשי","ירך אחורית"]},
+   note:"מיקום רגליים שונה מיום A כדי לשנות את הדגש לישבן ולירך הפנימית.",search:"Leg Press high wide stance tutorial form"},
+  {id:"c4_hip_thrust",grp:"legs",tally:["glutes"],sets:4,name:"הרמת אגן (Hip Thrust)",target:HEAVY(4),
+   works:{p:["ישבן"],s:["ירך אחורית"]},
+   note:"סנטר צמוד לחזה, לסחוט את הישבן למעלה ולעצור שנייה.",search:"Hip Thrust Machine tutorial form"},
+  {id:"c8_leg_extension",grp:"legs",tally:["quads"],sets:3,name:"פשיטת ברך במכונה",target:ISO(3),
+   works:{p:["ארבע ראשי"],s:[]},
+   note:"עצירה של שנייה למעלה, ירידה איטית.",search:"Leg Extension Machine tutorial form"},
+  {id:"c2b_db_flat_press",grp:"chest",tally:["chest"],sets:3,name:"לחיצת משקולות על ספסל ישר",target:HEAVY(3),
+   works:{p:["חזה (אמצעי)"],s:["כתף קדמית","טריצפס"]},
+   note:"ירידה איטית עד שהמרפקים מעט מתחת לקו הספסל.",search:"Flat Dumbbell Bench Press tutorial form"},
+  {id:"c2_pec_deck",grp:"chest",tally:["chest"],sets:3,name:"פרפר במכונה (Pec Deck)",target:ISO(3),
+   works:{p:["חזה (דגש פנימי)"],s:["כתף קדמית"]},
+   note:"🎯 עצירה של שנייה בנקודת המתיחה (הידיים לאחור). אפשר לסיים בשכיבות סמיכה עד כשל.",search:"Pec Deck Machine tutorial form"},
+  {id:"c3_close_pulldown",grp:"back",tally:["back"],sets:3,name:"פולי עליון אחיזה צמודה / ניטרלית",target:HEAVY(3),
+   works:{p:["רחב הגב","גב אמצעי"],s:["ביצפס","ברכיאליס"]},
+   note:"אחיזה צמודה מוסיפה עבודה לאמצע הגב.",search:"Close Grip Lat Pulldown tutorial form"},
+  {id:"c3b_wide_row",grp:"back",tally:["back"],sets:3,name:"חתירה במכונה (אחיזה רחבה)",target:HEAVY(3),
+   works:{p:["גב עליון ואמצעי","כתף אחורית"],s:["רחב הגב","ביצפס"]},
+   note:"אחיזה רחבה והמרפקים לצדדים מעבירים את הדגש לגב העליון.",search:"Wide Grip Row Machine tutorial form"},
+  {id:"c5_lateral_raise",grp:"shoulders",tally:["delts"],sets:3,name:"הרחקת כתף לצד עם משקולת",target:ISO(3),
+   works:{p:["כתף צדדית"],s:["טרפז עליון"]},
+   note:"מרפק מעט כפוף, לא להתנדנד עם הגוף.",search:"Dumbbell Lateral Raise tutorial form"},
+  {id:"c6_overhead_triceps_db",grp:"triceps",tally:["triceps"],sets:3,name:"פשיטת מרפקים מעל הראש עם משקולת",target:ISO(3),
+   works:{p:["טריצפס (ראש ארוך)"],s:["ראש צדדי ופנימי"]},
+   note:"🎯 תרגיל מתיחה: ירידה עמוקה מאחורי הראש.",search:"Overhead Dumbbell Triceps Extension tutorial form"},
+  {id:"c6b_pushdown",grp:"triceps",tally:["triceps"],sets:3,name:"פשיטת מרפקים בחבל (פולי עליון)",target:ISO(3),
+   works:{p:["טריצפס (ראש צדדי ופנימי)"],s:[]},
+   note:"מרפקים צמודים לגוף, לפתוח את החבל בתחתית התנועה.",search:"Triceps Rope Pushdown tutorial form"},
+  {id:"c7_hammer_curl",grp:"biceps",tally:["biceps"],sets:3,name:"כפיפת מרפקים בפטיש",target:ISO(3),
+   works:{p:["ברכיאליס","ביצפס"],s:["אמות"]},
+   note:"אחיזה ניטרלית עובדת גם על הברכיאליס ועל האמה.",search:"Hammer Curl tutorial form"},
+  {id:"c7b_cable_curl",grp:"biceps",tally:["biceps"],sets:3,name:"כפיפת מרפקים בכבל תחתון",target:ISO(3),
+   works:{p:["ביצפס"],s:["אמות"]},
+   note:"הכבל שומר על מתח לאורך כל התנועה, גם בתחתית.",search:"Cable Bicep Curl tutorial form"},
+  {id:"c9_leg_press_calf",grp:"calves",tally:["calves"],sets:3,name:"תאומים במכונת לחיצת רגליים",target:CALF(3),
+   works:{p:["תאומים (גסטרוקנמיוס)"],s:["סולאוס"]},
+   note:"רק קצה כף הרגל על הפלטפורמה, ברכיים מעט כפופות ולא נעולות. עצירה בנקודה הנמוכה.",search:"Calf Raise on Leg Press Machine tutorial form"}
+ ]}
 ];
 
-let activeDay = "A1";
+let activeDay="A";
+const openHistory={};
+const PREFIX="fullbody3_v1_";
 
-function ytUrl(q){
-  return "https://www.youtube.com/results?search_query=" + encodeURIComponent(q);
+function ytUrl(q){return "https://www.youtube.com/results?search_query="+encodeURIComponent(q);}
+function uid(){return Date.now().toString(36)+Math.random().toString(36).slice(2,7);}
+
+let HAS_STORAGE=false;
+try{const k="__t";localStorage.setItem(k,"1");localStorage.removeItem(k);HAS_STORAGE=true;}catch(e){}
+const mem={};
+
+function getLogs(exId){
+  const key=PREFIX+exId;
+  try{
+    const raw=HAS_STORAGE?localStorage.getItem(key):mem[key];
+    return raw?JSON.parse(raw):[];
+  }catch(e){return [];}
+}
+function setLogs(exId,logs){
+  const key=PREFIX+exId;
+  const raw=JSON.stringify(logs);
+  try{ if(HAS_STORAGE) localStorage.setItem(key,raw); else mem[key]=raw; }catch(e){}
+}
+function addLog(exId,entry){
+  const logs=getLogs(exId); logs.push(entry);
+  logs.sort((a,b)=>new Date(b.date)-new Date(a.date));
+  setLogs(exId,logs);
+}
+function deleteLog(exId,id){ setLogs(exId,getLogs(exId).filter(l=>l.id!==id)); }
+function updateLog(exId,id,patch){
+  const logs=getLogs(exId).map(l=>{
+    if(l.id!==id) return l;
+    const n=Object.assign({},l,patch);
+    if(!n.wu) delete n.wu;
+    if(n.rir===""||n.rir==null) delete n.rir;
+    return n;
+  });
+  logs.sort((a,b)=>new Date(b.date)-new Date(a.date));
+  setLogs(exId,logs);
+}
+function working(logs){return logs.filter(l=>!l.wu);}
+
+function e1rm(l){return parseFloat(l.weight)*(1+parseFloat(l.reps)/30);}
+function sessionsOf(logs){
+  const map={},arr=[];
+  logs.forEach(l=>{const k=dayKey(l.date); if(!map[k]){map[k]={key:k,sets:[]};arr.push(map[k]);} map[k].sets.push(l);});
+  arr.forEach(x=>{x.sets.sort((a,b)=>new Date(a.date)-new Date(b.date)); x.iso=x.sets[x.sets.length-1].date;});
+  arr.sort((a,b)=>new Date(b.iso)-new Date(a.iso));
+  return arr;
+}
+function topSet(sets){return sets.reduce((a,b)=>e1rm(b)>e1rm(a)?b:a);}
+function volumeOf(sets){return sets.reduce((a,l)=>a+parseFloat(l.weight)*parseFloat(l.reps),0);}
+function fmtNum(n){return String(Math.round(n)).replace(/\B(?=(\d{3})+(?!\d))/g,",");}
+function dayKey(iso){const d=new Date(iso);return d.getFullYear()+"-"+d.getMonth()+"-"+d.getDate();}
+function dayTitle(iso){
+  const d=new Date(iso), t=new Date();
+  const y=new Date(); y.setDate(t.getDate()-1);
+  if(d.toDateString()===t.toDateString()) return "היום";
+  if(d.toDateString()===y.toDateString()) return "אתמול";
+  return d.toLocaleDateString("he-IL",{weekday:"long",day:"numeric",month:"numeric"});
+}
+
+let toastTimer=null;
+function showToast(msg,action){
+  const t=document.getElementById("toast"); t.innerHTML="";
+  const sp=document.createElement("span"); sp.textContent=msg; t.appendChild(sp);
+  t.classList.toggle("has-act",!!action);
+  if(action){
+    const b=document.createElement("button"); b.className="toast-act"; b.textContent=action.label;
+    b.onclick=()=>{clearTimeout(toastTimer); t.classList.remove("show"); action.fn();};
+    t.appendChild(b);
+  }
+  t.classList.add("show");
+  clearTimeout(toastTimer); toastTimer=setTimeout(()=>t.classList.remove("show"),action?8000:1800);
+}
+
+function worksHtml(ex){
+  const p=ex.works.p.map(x=>'<span class="chip p">'+x+'</span>').join("");
+  const s=ex.works.s.map(x=>'<span class="chip s">'+x+'</span>').join("");
+  return '<div class="works"><span class="w-lbl">עיקרי:</span>'+p+
+    (s?'<span class="sep"></span><span class="w-lbl">משני:</span>'+s:'')+'</div>';
+}
+
+function renderWeekly(){
+  const tally={}; Object.keys(MUSCLES).forEach(k=>tally[k]=0);
+  days.forEach(d=>d.exercises.forEach(ex=>ex.tally.forEach(k=>{tally[k]+=ex.sets;})));
+  const body=document.getElementById("weeklyBody"); body.innerHTML="";
+  Object.keys(MUSCLES).forEach(k=>{
+    const n=tally[k], pct=Math.min(100,Math.round(n/12*100));
+    const row=document.createElement("div"); row.className="w-row";
+    row.innerHTML='<span>'+MUSCLES[k]+'</span><div class="w-bar"><div class="w-fill'+(n<9?' low':'')+'" style="width:'+pct+'%"></div></div><span class="w-num">'+n+' סטים</span>';
+    body.appendChild(row);
+  });
+  const note=document.createElement("div"); note.className="w-note";
+  note.textContent="סטים ישירים בלבד. תרגילים מורכבים נותנים גם עבודה עקיפה: לחיצות חזה עובדות גם על טריצפס וכתף קדמית, חתירות על ביצפס וכתף אחורית, סקוואט ולחיצת רגליים על ישבן וירך אחורית. היעד במחקר הוא 10+ סטים לשריר בשבוע, והסרגל מלא ב-12. סרגל כהה מסמן פחות מ-9 סטים ישירים. אחרי 4 שבועות מוסיפים סט רביעי לתרגילי הבסיס.";
+  body.appendChild(note);
 }
 
 function renderTabs(){
-  const tabs = document.getElementById("tabs");
-  tabs.innerHTML = "";
+  const tabs=document.getElementById("tabs"); tabs.innerHTML="";
   days.forEach(d=>{
-    const btn = document.createElement("div");
-    btn.className = "tab" + (d.key===activeDay ? " active" : "");
-    btn.textContent = d.key;
-    btn.onclick = ()=>{ activeDay = d.key; render(); };
-    tabs.appendChild(btn);
+    const b=document.createElement("div");
+    b.className="tab"+(d.key===activeDay?" active":"");
+    b.textContent="יום "+d.key;
+    b.onclick=()=>{activeDay=d.key;render();};
+    tabs.appendChild(b);
   });
 }
 
-// שמירה מקומית בדפדפן (localStorage) - עובד גם כשהקובץ נפתח עצמאית מחוץ ל-Claude,
-// כל עוד פותחים אותו דרך "פתח ב-Safari" ולא דרך Quick Look של אפליקציית Files.
-const STORAGE_PREFIX = "workout_tracker_v1_";
+function repsHi(ex){return parseInt(ex.target.match(/(\d+)-(\d+) חזרות/)[2],10);}
 
-function storageAvailable(){
-  try{
-    const testKey = "__test__";
-    localStorage.setItem(testKey, "1");
-    localStorage.removeItem(testKey);
-    return true;
-  }catch(e){
-    return false;
+function lastTimeHtml(ex){
+  const all=getLogs(ex.id);
+  if(!all.length) return '<span>עדיין אין נתונים. הסט הראשון קובע את נקודת ההתחלה.</span>';
+  const sess=sessionsOf(working(all));
+  const today=dayKey(new Date().toISOString());
+  const prev=sess.find(x=>x.key!==today);
+  let html = prev
+    ? 'פעם קודמת ('+dayTitle(prev.iso)+'): <b>'+prev.sets.map(x=>x.weight+'×'+x.reps).join(' · ')+'</b>'
+    : '<span>פעם קודמת: אין עדיין, זה האימון הראשון בתרגיל</span>';
+  const cur=sess[0];
+  if(cur){
+    const hi=repsHi(ex);
+    const maxW=Math.max.apply(null,cur.sets.map(x=>parseFloat(x.weight)));
+    const reached=cur.sets.length>=3 && cur.sets.every(x=>parseInt(x.reps,10)>=hi && parseFloat(x.weight)===maxW);
+    if(reached) html+=' <span class="tip">↑ הגיע הזמן להעלות משקל</span>';
   }
+  return html;
 }
-const HAS_STORAGE = storageAvailable();
-let memoryFallback = {};
 
-async function getLogs(exId){
-  const key = STORAGE_PREFIX + exId;
-  try{
-    if(HAS_STORAGE){
-      const raw = localStorage.getItem(key);
-      return raw ? JSON.parse(raw) : [];
-    }
-    return memoryFallback[key] || [];
-  }catch(e){
-    console.error("Storage read error:", e);
-    return [];
+function sparkSvg(vals){
+  const n=vals.length, W=84, H=24, pad=3;
+  const mn=Math.min.apply(null,vals), mx=Math.max.apply(null,vals), rg=(mx-mn)||1;
+  const pts=vals.map((v,i)=>[pad+i*(W-2*pad)/(n-1), H-pad-((v-mn)/rg)*(H-2*pad)]);
+  const last=pts[n-1];
+  return '<svg viewBox="0 0 '+W+' '+H+'" role="img" aria-label="גרף מגמה"><polyline points="'+pts.map(p=>p[0].toFixed(1)+','+p[1].toFixed(1)).join(' ')+'"/><circle cx="'+last[0].toFixed(1)+'" cy="'+last[1].toFixed(1)+'" r="2.6"/></svg>';
+}
+
+function statsHtml(ex){
+  const ws=working(getLogs(ex.id));
+  if(!ws.length) return '';
+  const sess=sessionsOf(ws).reverse();
+  const tops=sess.map(x=>e1rm(topSet(x.sets)));
+  const best=topSet(ws);
+  const maxW=Math.max.apply(null,ws.map(x=>parseFloat(x.weight)));
+  let html='<span>שיא סט: <b>'+best.weight+'×'+best.reps+'</b></span><span>משקל מקס׳: <b>'+maxW+'</b></span>'+
+           '<span>מדד כוח: <b>'+Math.round(tops[tops.length-1])+'</b>';
+  if(tops.length>=2 && tops[tops.length-2]>0){
+    const pct=(tops[tops.length-1]-tops[tops.length-2])/tops[tops.length-2]*100;
+    if(Math.abs(pct)<0.5) html+=' <span>＝ יציב</span>';
+    else html+=' <span class="'+(pct>0?'up':'down')+'">'+(pct>0?'▲ +':'▼ ')+pct.toFixed(1)+'%</span>';
   }
+  html+='</span>';
+  if(tops.length>=2) html+=sparkSvg(tops.slice(-10));
+  return html;
 }
 
-async function saveLog(exId, entry){
-  const key = STORAGE_PREFIX + exId;
-  const logs = await getLogs(exId);
-  logs.push(entry);
-  try{
-    if(HAS_STORAGE){
-      localStorage.setItem(key, JSON.stringify(logs));
-    }else{
-      memoryFallback[key] = logs;
-    }
-  }catch(e){
-    console.error("Storage write error:", e);
-  }
+function prevSetFor(ex){
+  const logs=getLogs(ex.id), today=dayKey(new Date().toISOString());
+  const prev=sessionsOf(working(logs)).find(x=>x.key!==today);
+  if(!prev) return null;
+  const doneToday=working(logs).filter(l=>dayKey(l.date)===today).length;
+  return prev.sets[doneToday]||prev.sets[prev.sets.length-1];
+}
+function todayWorkingCount(ex){
+  const today=dayKey(new Date().toISOString());
+  return working(getLogs(ex.id)).filter(l=>dayKey(l.date)===today).length;
 }
 
-function formatDate(iso){
-  const d = new Date(iso);
-  return d.toLocaleDateString('he-IL', {day:'numeric', month:'numeric'});
+function refreshCard(ex,card){
+  const logs=getLogs(ex.id);
+  card.querySelector(".count").textContent=logs.length;
+  card.querySelector(".last-time").innerHTML=lastTimeHtml(ex);
+  card.querySelector(".ex-stats").innerHTML=statsHtml(ex);
+  const wu=card.querySelector(".wu-input").checked;
+  card.querySelector(".add-btn").textContent=wu?"שמור חימום":"שמור סט "+(todayWorkingCount(ex)+1);
+  const fb=card.querySelector(".fill-btn"), pv=prevSetFor(ex);
+  if(pv){fb.style.display="";fb.textContent="↺ כמו קודם ("+pv.weight+"×"+pv.reps+")";fb._pv=pv;}
+  else{fb.style.display="none";fb._pv=null;}
+  renderHistory(ex,card);
 }
 
-async function renderExercise(ex, container){
-  const card = document.createElement("div");
-  card.className = "exercise";
+function renderHistory(ex,card){
+  const listEl=card.querySelector(".history");
+  const logs=getLogs(ex.id);
+  if(!logs.length){listEl.innerHTML='<div class="history-empty">אין עדיין סטים רשומים</div>';return;}
+  const ws=working(logs);
+  const best=ws.length?topSet(ws):null;
+  listEl.innerHTML="";
+  sessionsOf(logs).forEach(g=>{
+    const wrk=working(g.sets);
+    const wrap=document.createElement("div");
+    wrap.innerHTML='<div class="day-group-title">'+dayTitle(g.iso)+
+      (wrk.length?'<span class="vol"> · נפח '+fmtNum(volumeOf(wrk))+' ק"ג</span>':'')+
+      '</div><div class="day-group-sets"></div>';
+    const box=wrap.querySelector(".day-group-sets");
+    let n=0;
+    g.sets.forEach(l=>{
+      if(!l.wu) n++;
+      const isBest=best&&l.id===best.id;
+      const row=document.createElement("div");
+      row.className="history-entry"+(isBest?" best":"")+(l.wu?" wu":"");
+      const showRow=()=>{
+        row.innerHTML='<div class="hd-left"><span class="hd-set">'+(l.wu?'חימום':'סט '+n)+'</span>'+
+          '<span class="hd-value">'+l.weight+' ק"ג × '+l.reps+'</span>'+
+          (l.rir!=null?'<span class="hd-rir">RIR '+(l.rir==="3"?"3+":l.rir)+'</span>':'')+
+          (isBest?'<span class="hd-star">★ שיא</span>':'')+'</div>'+
+          '<div class="hd-acts"><button class="hd-edit" aria-label="ערוך סט">✎</button>'+
+          '<button class="hd-del" aria-label="מחק סט">🗑</button></div>';
+        row.querySelector(".hd-del").onclick=()=>{
+          deleteLog(ex.id,l.id); refreshCard(ex,card);
+          showToast("הסט נמחק",{label:"בטל",fn:()=>{addLog(ex.id,l);refreshCard(ex,card);showToast("הסט שוחזר ✓");}});
+        };
+        row.querySelector(".hd-edit").onclick=showEdit;
+      };
+      const showEdit=()=>{
+        row.innerHTML='<div class="edit-row">'+
+          '<input type="number" inputmode="decimal" step="any" class="e-w" aria-label="משקל" value="'+l.weight+'">'+
+          '<input type="number" inputmode="numeric" class="e-r" aria-label="חזרות" value="'+l.reps+'">'+
+          rirSelectHtml("e-rir",l.rir)+
+          '<label class="wu-lbl"><input type="checkbox" class="e-wu"'+(l.wu?' checked':'')+'> חימום</label>'+
+          '<button class="e-save">שמור</button><button class="e-cancel">ביטול</button></div>';
+        row.querySelector(".e-cancel").onclick=showRow;
+        row.querySelector(".e-save").onclick=()=>{
+          const wv=parseFloat(row.querySelector(".e-w").value), rv=parseInt(row.querySelector(".e-r").value,10);
+          if(!(wv>=0)||!(rv>0)||wv>1000||rv>200){showToast("ערך לא תקין");return;}
+          updateLog(ex.id,l.id,{weight:String(wv),reps:String(rv),rir:row.querySelector(".e-rir").value,wu:row.querySelector(".e-wu").checked});
+          refreshCard(ex,card); showToast("עודכן ✓");
+        };
+      };
+      showRow();
+      box.appendChild(row);
+    });
+    listEl.appendChild(wrap);
+  });
+}
 
-  card.innerHTML = `
-    <div class="ex-head">
-      <div>
-        <div class="ex-name">${ex.name}</div>
-        <div class="ex-target">יעד: ${ex.target}</div>
-      </div>
-      <a class="yt-link" href="${ytUrl(ex.search)}" target="_blank" rel="noopener">
-        ${YT_ICON} <span>סרטון</span>
-      </a>
-    </div>
-    <div class="log-row">
-      <input type="number" inputmode="decimal" placeholder="משקל (ק״ג)" class="w-input" />
-      <input type="number" inputmode="numeric" placeholder="חזרות" class="r-input" />
-      <button class="add-btn">שמור סט</button>
-    </div>
-    <div class="history" id="hist-${ex.id}"><span class="history-empty">טוען...</span></div>
-  `;
+function rirSelectHtml(cls,val){
+  const o=(v,t)=>'<option value="'+v+'"'+((val===v)?' selected':'')+'>'+t+'</option>';
+  return '<select class="'+cls+'" aria-label="חזרות שנשארו בטנק (RIR), אופציונלי">'+
+    '<option value="">RIR</option>'+o("0","0 · כשל")+o("1","1")+o("2","2")+o("3","3+")+'</select>';
+}
 
+function renderExercise(ex,idx,container){
+  const card=document.createElement("div"); card.className="exercise";
+  card.innerHTML=
+   '<div class="ex-head"><div>'+
+     '<div class="ex-num">תרגיל '+(idx+1)+'</div>'+
+     '<div class="ex-name">'+ex.name+'</div>'+
+     '<div class="ex-target">'+ex.target+'</div>'+
+     worksHtml(ex)+
+     (ex.note?'<div class="ex-note">'+ex.note+'</div>':'')+
+   '</div><a class="yt-link" href="'+ytUrl(ex.search)+'" target="_blank" rel="noopener">'+YT_ICON+'<span>סרטון</span></a></div>'+
+   '<div class="last-time"></div>'+
+   '<div class="ex-stats"></div>'+
+   '<div class="log-row">'+
+     '<input type="number" inputmode="decimal" step="any" placeholder="משקל (ק״ג)" aria-label="משקל בקילוגרם" class="w-input">'+
+     '<input type="number" inputmode="numeric" placeholder="חזרות" aria-label="חזרות" class="r-input">'+
+     '<div class="rir-wrap">'+rirSelectHtml("rir-input","")+'</div></div>'+
+   '<div class="log-row2">'+
+     '<label class="wu-lbl"><input type="checkbox" class="wu-input"> חימום</label>'+
+     '<button class="fill-btn" style="display:none"></button>'+
+     '<button class="add-btn">שמור סט</button></div>'+
+   '<div class="history-toggle"><span>היסטוריה<span class="count">0</span></span><span class="chevron">⌄</span></div>'+
+   '<div class="history"></div>';
   container.appendChild(card);
 
-  const wInput = card.querySelector(".w-input");
-  const rInput = card.querySelector(".r-input");
-  const addBtn = card.querySelector(".add-btn");
-  const histEl = card.querySelector(`#hist-${ex.id}`);
+  const w=card.querySelector(".w-input"), r=card.querySelector(".r-input"), rir=card.querySelector(".rir-input");
+  const wu=card.querySelector(".wu-input"), add=card.querySelector(".add-btn"), fill=card.querySelector(".fill-btn");
+  const hist=card.querySelector(".history"), tog=card.querySelector(".history-toggle");
 
-  async function refreshHistory(){
-    const logs = await getLogs(ex.id);
-    if(logs.length === 0){
-      histEl.innerHTML = '<span class="history-empty">אין עדיין סטים רשומים</span>';
-      return;
-    }
-    const maxWeight = Math.max(...logs.map(l=>parseFloat(l.weight)||0));
-    const recent = logs.slice(-8);
-    histEl.innerHTML = recent.map(l=>{
-      const isBest = parseFloat(l.weight) === maxWeight && maxWeight > 0;
-      return `<span class="history-chip${isBest?' best':''}">${formatDate(l.date)}: ${l.weight}×${l.reps}</span>`;
-    }).join("");
-  }
-
-  addBtn.onclick = async ()=>{
-    const w = wInput.value;
-    const r = rInput.value;
-    if(!w || !r) return;
-    addBtn.disabled = true;
-    try{
-      await saveLog(ex.id, { date: new Date().toISOString(), weight: w, reps: r });
-      wInput.value = "";
-      rInput.value = "";
-      await refreshHistory();
-    }catch(e){
-      console.error("Storage error:", e);
-    }finally{
-      addBtn.disabled = false;
-    }
+  if(openHistory[ex.id]){hist.classList.add("open");tog.classList.add("open");}
+  tog.onclick=()=>{
+    const o=hist.classList.toggle("open"); tog.classList.toggle("open",o); openHistory[ex.id]=o;
   };
-
-  refreshHistory();
-}
-
-function checkStorageWarning(){
-  if(!HAS_STORAGE){
-    const note = document.getElementById("topNote");
-    note.textContent = "שים לב: הדפדפן הזה חוסם שמירה מקומית (למשל תצוגת Quick Look). פתח את הקובץ עם \"פתח ב-Safari\" כדי שהנתונים יישמרו.";
-    note.style.borderColor = "var(--danger)";
-    note.style.color = "var(--danger)";
-  }
+  wu.onchange=()=>refreshCard(ex,card);
+  fill.onclick=()=>{
+    const pv=fill._pv; if(!pv) return;
+    w.value=pv.weight; r.value=pv.reps; rir.value=pv.rir!=null?pv.rir:"";
+  };
+  add.onclick=()=>{
+    const wv=parseFloat(w.value), rv=parseInt(r.value,10);
+    if(w.value===""||!(wv>=0)||!(rv>0)) {showToast("מלא משקל וחזרות");return;}
+    if(wv>1000||rv>200){showToast("ערך חריג, בדוק שוב");return;}
+    const isWu=wu.checked;
+    const before=working(getLogs(ex.id));
+    const entry={id:uid(),date:new Date().toISOString(),weight:String(wv),reps:String(rv)};
+    if(isWu) entry.wu=true;
+    if(rir.value!=="") entry.rir=rir.value;
+    let msg="נשמר ✓";
+    if(!isWu && before.length){
+      const prevE=Math.max.apply(null,before.map(e1rm)), prevW=Math.max.apply(null,before.map(x=>parseFloat(x.weight)));
+      if(e1rm(entry)>prevE+0.01) msg="🏆 שיא חדש במדד הכוח!";
+      else if(wv>prevW) msg="🏆 שיא משקל חדש!";
+    }
+    addLog(ex.id,entry);
+    wu.checked=false;
+    refreshCard(ex,card);
+    hist.classList.add("open"); tog.classList.add("open"); openHistory[ex.id]=true;
+    showToast(msg);
+  };
+  refreshCard(ex,card);
 }
 
 function render(){
-  checkStorageWarning();
   renderTabs();
-  const day = days.find(d=>d.key===activeDay);
-  document.getElementById("dayLabel").textContent = day.label;
-  const list = document.getElementById("exerciseList");
-  list.innerHTML = "";
-  day.exercises.forEach(ex=>renderExercise(ex, list));
+  const day=days.find(d=>d.key===activeDay);
+  document.getElementById("dayLabel").textContent=day.label;
+  const list=document.getElementById("exerciseList"); list.innerHTML="";
+  let last=null;
+  day.exercises.forEach((ex,i)=>{
+    if(ex.grp!==last){
+      last=ex.grp;
+      const cnt=day.exercises.filter(e=>e.grp===ex.grp).reduce((a,e)=>a+e.sets,0);
+      const h=document.createElement("div"); h.className="grp-title";
+      h.innerHTML='<span class="g-name"><span>'+GROUPS[ex.grp].icon+'</span>'+GROUPS[ex.grp].label+'</span><span class="g-sets">'+cnt+' סטים</span>';
+      list.appendChild(h);
+    }
+    renderExercise(ex,i,list);
+  });
 }
 
+const BK_KEY=PREFIX+"_meta_lastBackup";
+function getLastBackup(){
+  try{const v=HAS_STORAGE?localStorage.getItem(BK_KEY):mem[BK_KEY]; return v?parseInt(v,10):0;}catch(e){return 0;}
+}
+function markBackup(){
+  try{const v=String(Date.now()); if(HAS_STORAGE) localStorage.setItem(BK_KEY,v); else mem[BK_KEY]=v;}catch(e){}
+  updateBackupNote();
+}
+function allLogsFlat(){
+  const out=[];
+  days.forEach(d=>d.exercises.forEach(ex=>getLogs(ex.id).forEach(l=>out.push({ex:ex,l:l}))));
+  return out;
+}
+function updateBackupNote(){
+  const el=document.getElementById("backupWarn"); if(!el) return;
+  const total=allLogsFlat().length, last=getLastBackup();
+  if(!total){el.textContent="";return;}
+  if(!last){el.textContent="⚠ עוד לא ייצאת גיבוי. "+total+" סטים שמורים רק בדפדפן הזה.";return;}
+  const age=Math.floor((Date.now()-last)/86400000);
+  el.textContent=age>=14?"⚠ הגיבוי האחרון לפני "+age+" ימים. כדאי לייצא שוב.":"";
+}
+function download(name,type,text){
+  const blob=new Blob([text],{type:type});
+  const a=document.createElement("a");
+  a.href=URL.createObjectURL(blob); a.download=name;
+  document.body.appendChild(a); a.click(); a.remove();
+}
+document.getElementById("exportBtn").onclick=()=>{
+  const data={};
+  days.forEach(d=>d.exercises.forEach(ex=>{const l=getLogs(ex.id); if(l.length) data[ex.id]=l;}));
+  download("workout-backup-"+new Date().toISOString().slice(0,10)+".json","application/json",
+    JSON.stringify({version:1,exported:new Date().toISOString(),data},null,2));
+  markBackup(); showToast("הגיבוי הורד");
+};
+document.getElementById("csvBtn").onclick=()=>{
+  const rows=allLogsFlat().sort((a,b)=>new Date(a.l.date)-new Date(b.l.date));
+  const q=v=>'"'+String(v).replace(/"/g,'""')+'"';
+  const lines=["datetime_iso,exercise,set_type,weight_kg,reps,rir,strength_index"];
+  rows.forEach(({ex,l})=>lines.push([l.date,q(ex.name),l.wu?"warmup":"working",l.weight,l.reps,l.rir!=null?l.rir:"",l.wu?"":e1rm(l).toFixed(1)].join(",")));
+  download("workout-log-"+new Date().toISOString().slice(0,10)+".csv","text/csv;charset=utf-8","﻿"+lines.join("\n"));
+  showToast("קובץ CSV הורד");
+};
+document.getElementById("importFile").onchange=(e)=>{
+  const f=e.target.files[0]; if(!f) return;
+  const known=new Set(); days.forEach(d=>d.exercises.forEach(ex=>known.add(ex.id)));
+  const valid=x=>x&&typeof x.id==="string"&&!isNaN(new Date(x.date))&&parseFloat(x.weight)>=0&&parseInt(x.reps,10)>0;
+  const rd=new FileReader();
+  rd.onload=()=>{
+    try{
+      const obj=JSON.parse(rd.result); const data=obj.data||{};
+      let n=0;
+      Object.keys(data).forEach(id=>{
+        if(!known.has(id)||!Array.isArray(data[id])) return;
+        const cur=getLogs(id); const have=new Set(cur.map(x=>x.id));
+        data[id].forEach(x=>{ if(valid(x)&&!have.has(x.id)){cur.push(x);have.add(x.id);n++;} });
+        cur.sort((a,b)=>new Date(b.date)-new Date(a.date)); setLogs(id,cur);
+      });
+      render(); updateBackupNote(); showToast("יובאו "+n+" סטים");
+    }catch(err){showToast("קובץ לא תקין");}
+    e.target.value="";
+  };
+  rd.readAsText(f);
+};
+
+try{ if(navigator.storage&&navigator.storage.persist) navigator.storage.persist(); }catch(e){}
 render();
+renderWeekly();
+updateBackupNote();
 </script>
 </body>
 </html>
